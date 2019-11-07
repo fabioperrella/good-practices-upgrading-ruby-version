@@ -1,0 +1,16 @@
+#preso .content h1 {
+  border: none;
+}
+
+.small {
+  font-size: 90%;
+}
+.smaller {
+  font-size: 80%;
+}
+
+@media screen {
+  .slide {
+    font-size: 1.8em;
+  }
+}
