@@ -16,7 +16,7 @@ $ bundle install
 To start the webserver, run:
 
 ```bash
-$ bundle exec showoff serve
+$ bundle exec showoff serve --nocache
 ```
 
 To publish the static version, run:

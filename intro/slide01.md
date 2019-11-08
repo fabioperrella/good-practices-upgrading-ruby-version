@@ -8,9 +8,43 @@
 
 !SLIDE center
 
-# Help others to lose less time debugging like I used to lose
+* Why upgrade ruby version?
+* Show the problems we had when we tried
+* Show possible solutions to solve the problems
 
-!SLIDE small
+!SLIDE center
+
+# Why upgrade ruby?
+
+!SLIDE center
+
+# Why upgrade ruby?
+
+* Every christmas a new (minor) version of Ruby is released
+* Every march (or february) the last supported minor version reaches the end-of-life (eol)
+
+!SLIDE center
+
+# Why upgrade ruby?
+
+    Ruby 2.7
+    status: preview
+    release date:
+
+    Ruby 2.6
+    status: normal maintenance
+    release date: 2018-12-25
+
+    Ruby 2.5
+    status: normal maintenance
+    release date: 2017-12-25
+
+    Ruby 2.4
+    status: security maintenance
+    release date: 2016-12-25
+    EOL date: 2020-03-31
+
+!SLIDE
 
 # Finish him! Questions??
 
