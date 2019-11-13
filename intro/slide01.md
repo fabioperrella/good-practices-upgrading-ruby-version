@@ -1,6 +1,6 @@
 !SLIDE center subsection
 
-# Good practices when upgrading Ruby version
+# Good practices to help when upgrading the Ruby version in an application
 
 ## Fabio Perrella
 
@@ -8,24 +8,18 @@
 
 !SLIDE center
 
-* Why upgrade ruby version?
-* Show the problems we had when we tried
-* Show possible solutions to solve the problems
+# Why upgrade Ruby version? (in an application)
 
 !SLIDE center
 
-# Why upgrade ruby?
-
-!SLIDE center
-
-# Why upgrade ruby?
+# Why upgrade Ruby?
 
 * Every christmas a new (minor) version of Ruby is released
 * Every march (or february) the last supported minor version reaches the end-of-life (eol)
 
 !SLIDE center
 
-# Why upgrade ruby?
+# Last Ruby releases
 
     Ruby 2.7
     status: preview
@@ -43,6 +37,106 @@
     status: security maintenance
     release date: 2016-12-25
     EOL date: 2020-03-31
+
+!SLIDE center
+
+# Imagine a perfect world when you upgrade the Ruby version and all tests pass!
+
+!SLIDE center
+
+# Now, wake up!!
+
+!SLIDE center
+
+# 1st problem: **bundle install**
+
+!SLIDE center
+
+# 1st problem: **bundle install**
+
+* Some gems works only in specific range of Ruby versions
+* Some gems has dependencies which works only in specific range of Ruby versions
+* Some gems doesn't know they work only in specific range of Ruby versions
+
+!SLIDE center
+
+# How a gem specifies the required Ruby version
+
+    @@@ruby
+    # This gem will work with 1.8.6 or greater...
+    spec.required_ruby_version = '>= 1.8.6'
+
+    # Only with ruby 2.0.x
+    spec.required_ruby_version = '~> 2.0'
+
+    # Only prereleases or final releases after 2.6.0.preview2
+    spec.required_ruby_version = '> 2.6.0.preview2'
+
+https://guides.rubygems.org/specification-reference/#required_ruby_version
+
+!SLIDE center
+
+# 1st problem: **bundle install**
+
+## Always try to upgrade to the latest Ruby version
+
+Gems are not used to restrict the new versions, examples:
+
+    @@@text
+    sinatra.gemspec:  s.required_ruby_version = '>= 2.2.0'
+    webmock.gemspec:  s.required_ruby_version = '>= 2.0'
+    public_suffix.gemspec:  s.required_ruby_version = ">= 2.1"
+    rack.gemspec:  s.required_ruby_version = '>= 2.2.2'
+    safe_yaml.gemspec:  gem.required_ruby_version = ">= 1.8.7"
+    mustermann.gemspec:  s.required_ruby_version = '>= 2.2.0'
+    tzinfo.gemspec:  s.required_ruby_version = '>= 1.8.7'
+
+Example (assuming the lastes Ruby version is 2.6):
+
+* upgrading from 2.3 to 2.6 should be easier than upgrading from 2.3 to 2.4
+
+!SLIDE center
+
+# 1st problem: **bundle install**
+
+## Delete your Gemfile.lock, update the .ruby-version and install the gems again
+
+Before do it, it is good to specify all versions with `'~> x.y'` in `Gemfile`, ex:
+
+    @@@ruby
+    # example of a gem without version specification in Gemfile
+    gem 'aasm'
+
+    # $ bundle show aasm
+    # .../lib/ruby/gems/2.6.0/gems/aasm-4.12.3
+
+    # Now, add the version specification to "block" the major upgrade:
+    gem 'aasm', '~> 4.12'
+
+By doing this, it prevents to use a new major version which may brake some test
+
+!SLIDE center
+
+# Semver (Semantic Versioning)
+
+https://semver.org
+
+    @@@text
+    Given a version number MAJOR.MINOR.PATCH, increment the:
+
+    MAJOR version when you make incompatible API changes,
+    MINOR version when you add functionality in a backwards compatible manner, and
+    PATCH version when you make backwards compatible bug fixes.
+
+**note1**: Ruby versions **do not** follow Semver, but the majority of the gems,
+does it!
+
+**note2**: If it is necessary to upgrade the major version, search for files like
+CHANGELOG.md or RELEASES.md in the gems source to know what changed to break the
+compatibility.
+
+**note3**: If you are a gem maintainer, https://keepachangelog.com and follow
+Semver!
 
 !SLIDE
 
