@@ -138,6 +138,31 @@ Semver!
 
 !SLIDE
 
+- atualização do rails fica pra depois
+- problem 1.1 internal gems may support different versions of ruby
+- corrija todas as gems internas para suportar o ruby novo, e se possivel o
+velho ao mesmo tempo. Com isso, da pra seguir com as atualizações nas 2 versões
+    + deletar Gemfile.lock das gems internas
+    + configurar pipeline para rodar build com todas as versões suportadas (matriz de versões)
+    + se houver IF ruby_version no gemspec, usar o nome do ruby pra indicar como foi o build, ex: 13.0.0.ruby26
+- dependencias externas podem atrapalhar na evolução, por exemplo versão do banco
+de dados ou do redis
+- algumas gems podem estar amarradas a versoes especificas de outras gems
+```
+-  s.add_runtime_dependency 'activesupport', '~> 5.1.4'
++  s.add_runtime_dependency 'activesupport', '~> 3.2'
+```
+- problem 2: fazer os testes passarem
+- arrume os warnings, ex:
+```
+-        expect(WebMock).to_not have_requested(:post, %r|lala/new?*|)
++        expect(WebMock).to_not have_requested(:post, %r|lala/new\?*|)
+```
+- problema 3: fazer o deploy funcionar
+
+
+!SLIDE
+
 # Finish him! Questions??
 
 ## Picks
