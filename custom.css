@@ -8,9 +8,16 @@
 .smaller {
   font-size: 80%;
 }
+.big {
+  font-size: 3.8em;
+}
 
 @media screen {
   .slide {
     font-size: 1.8em;
   }
+}
+
+.slide .red{
+  color: red;
 }

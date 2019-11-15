@@ -40,9 +40,9 @@
 
 !SLIDE center
 
-# Imagine a perfect world when you upgrade the Ruby version and all tests pass!
+# Imagine a perfect world when you upgrade the Ruby version and all the tests pass!
 
-!SLIDE center
+!SLIDE center red big
 
 # Now, wake up!!
 
@@ -54,9 +54,9 @@
 
 # 1st problem: **bundle install**
 
-* Some gems works only in specific range of Ruby versions
-* Some gems has dependencies which works only in specific range of Ruby versions
-* Some gems doesn't know they work only in specific range of Ruby versions
+* Some gems only work in specific range of Ruby versions
+* Some gems have dependencies which works only in specific range of Ruby versions
+* Some gems do not know they only work in specific range of Ruby versions!
 
 !SLIDE center
 
@@ -91,9 +91,7 @@ Gems are not used to restrict the new versions, examples:
     mustermann.gemspec:  s.required_ruby_version = '>= 2.2.0'
     tzinfo.gemspec:  s.required_ruby_version = '>= 1.8.7'
 
-Example (assuming the lastes Ruby version is 2.6):
-
-* upgrading from 2.3 to 2.6 should be easier than upgrading from 2.3 to 2.4
+Upgrading from 2.3 to 2.6 should be easier than upgrading from 2.3 to 2.4
 
 !SLIDE center
 
@@ -113,7 +111,7 @@ Before do it, it is good to specify all versions with `'~> x.y'` in `Gemfile`, e
     # Now, add the version specification to "block" the major upgrade:
     gem 'aasm', '~> 4.12'
 
-By doing this, it prevents to use a new major version which may brake some test
+By doing this, it prevents to use a new major version which may brake some tests
 
 !SLIDE center
 
@@ -128,11 +126,11 @@ https://semver.org
     MINOR version when you add functionality in a backwards compatible manner, and
     PATCH version when you make backwards compatible bug fixes.
 
-**note1**: Ruby versions **do not** follow Semver, but the majority of the gems,
-does it!
+**note1**: Ruby versions **do not** follow Semver, but the majority of the gems
+do!
 
-**note2**: If it is necessary to upgrade the major version, search for files like
-CHANGELOG.md or RELEASES.md in the gems source to know what changed to break the
+**note2**: If necessary to upgrade the major version, search for files like
+CHANGELOG.md or RELEASES.md in gem's source to know what changed to break the
 compatibility.
 
 **note3**: If you are a gem maintainer, https://keepachangelog.com and follow
