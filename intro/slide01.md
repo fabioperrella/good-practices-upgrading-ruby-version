@@ -40,7 +40,17 @@
 
 !SLIDE center
 
-# Imagine a perfect world when you upgrade the Ruby version and all the tests pass!
+# What about Rails??
+
+## Rails has a release frequency slower than Ruby
+
+## I will not talk about upgrading Rails in this talk (maybe next year!)
+
+!SLIDE center
+
+# Upgrading Ruby
+
+## Imagine a perfect world when you upgrade the Ruby version and all the tests pass!
 
 !SLIDE center red big
 
@@ -111,7 +121,7 @@ Before do it, it is good to specify all versions with `'~> x.y'` in `Gemfile`, e
     # Now, add the version specification to "block" the major upgrade:
     gem 'aasm', '~> 4.12'
 
-By doing this, it prevents to use a new major version which may brake some tests
+By doing this, it prevents to use a new major version which may break some tests
 
 !SLIDE center
 
@@ -129,9 +139,9 @@ https://semver.org
 **note1**: Ruby versions **do not** follow Semver, but the majority of the gems
 do!
 
-**note2**: If necessary to upgrade the major version, search for files like
-CHANGELOG.md or RELEASES.md in gem's source to know what changed to break the
-compatibility.
+**note2**: If necessary to upgrade a major version, search for files like
+CHANGELOG.md or RELEASES.md in gem's source to know why the
+compatibility was broken.
 
 **note3**: If you are a gem maintainer, https://keepachangelog.com and follow
 Semver!
@@ -144,7 +154,7 @@ Semver!
 velho ao mesmo tempo. Com isso, da pra seguir com as atualizações nas 2 versões
     + deletar Gemfile.lock das gems internas
     + configurar pipeline para rodar build com todas as versões suportadas (matriz de versões)
-    + se houver IF ruby_version no gemspec, usar o nome do ruby pra indicar como foi o build, ex: 13.0.0.ruby26
+    + se houver IF ruby_version no gemspec, usar o nome do ruby pra indicar como foi o build, ex: r13.0.0.ruby26
 - dependencias externas podem atrapalhar na evolução, por exemplo versão do banco
 de dados ou do redis
 - algumas gems podem estar amarradas a versoes especificas de outras gems
