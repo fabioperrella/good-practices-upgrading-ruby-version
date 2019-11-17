@@ -109,7 +109,7 @@ Upgrading from 2.3 to 2.6 should be easier than upgrading from 2.3 to 2.4
 
 ## Delete your Gemfile.lock, update the .ruby-version and install the gems again
 
-Before do it, it is good to specify all versions with `'~> x.y'` in `Gemfile`, ex:
+Before, it is good to specify all versions with `'~> x.y'` in `Gemfile`, ex:
 
     @@@ruby
     # example of a gem without version specification in Gemfile
@@ -146,9 +146,74 @@ compatibility was broken.
 **note3**: If you are a gem maintainer, https://keepachangelog.com and follow
 Semver!
 
+!SLIDE center
+
+# Problem 1.1: **internal gems**
+
+!SLIDE center
+
+# Problem 1.1: **internal gems**
+
+## Strategy 1: keep compatibility with old rubies
+## Strategy 2: break compatibility with old rubies
+
+!SLIDE center
+
+## Strategy 1: keep compatibility with old rubies
+
+* allow upgrading the gem even in the projects with old Ruby versions
+* recommended if there are **many** projects using the gem.
+* more complex, it will require some `if RUBY_VERSION > X` in the code
+
+## Strategy 2: break compatibility with old rubies
+
+* easier to maintain (if it is possible to forget about the apps with old Rubies)
+* it **can be a nightmare** to manage the branches if you need to change something
+in a app with olf Ruby
+
+!SLIDE center
+
+## Strategy 1: keep compatibility with old rubies
+
+- delete the Gemfile.lock from git! (https://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile)
+- set `required_ruby_version` in Gemspec with a range
+- setup the pipeline to run the tests for all supported versions
+- maybe use different Gemfiles to run the tests (to test all supported versions)
+
+!SLIDE center
+
+## Example with different ruby versions and Gemfiles
+
+    @@@yaml
+    matrix:
+      include:
+        - rvm: "2.1.5"
+          gemfile: Gemfile-old-ruby
+        - rvm: "2.2.1"
+          gemfile: Gemfile-old-ruby
+        - rvm: "2.2.2"
+        - rvm: "2.3.0"
+        - rvm: "2.3.3"
+        - rvm: 2.4
+        - rvm: 2.4
+          gemfile: Gemfile-redis-3
+        - rvm: 2.4
+          gemfile: Gemfile-redis-4
+        - rvm: 2.5
+        - rvm: 2.5
+          gemfile: Gemfile-redis-3
+
+!SLIDE center
+
+# Different Gemfiles
+
+    @@@ruby
+    spec.add_dependency 'redis', '>= 3.2.0', '< 5'
+
+![](../_images/gemfilediff.png)
+
 !SLIDE
 
-- atualização do rails fica pra depois
 - problem 1.1 internal gems may support different versions of ruby
 - corrija todas as gems internas para suportar o ruby novo, e se possivel o
 velho ao mesmo tempo. Com isso, da pra seguir com as atualizações nas 2 versões
