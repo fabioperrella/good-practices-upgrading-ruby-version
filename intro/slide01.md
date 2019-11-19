@@ -214,6 +214,8 @@ in a app with of Ruby
 
 !SLIDE
 
+- fizemos essas anotações quando estavamos atualizando o ruby de umas aplicações
+- mencionar o kloquinho que é co-author "ghost" dessa palestra
 - eu queria que essa palestra resolvesse todos os problemas, mas não é possivel, isso é dificil mesmo!
 - problem 1.1 internal gems may support different versions of ruby
 - corrija todas as gems internas para suportar o ruby novo, e se possivel o
