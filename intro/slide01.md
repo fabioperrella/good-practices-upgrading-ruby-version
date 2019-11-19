@@ -214,6 +214,7 @@ in a app with of Ruby
 
 !SLIDE
 
+- eu queria que essa palestra resolvesse todos os problemas, mas não é possivel, isso é dificil mesmo!
 - problem 1.1 internal gems may support different versions of ruby
 - corrija todas as gems internas para suportar o ruby novo, e se possivel o
 velho ao mesmo tempo. Com isso, da pra seguir com as atualizações nas 2 versões
