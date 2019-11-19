@@ -169,7 +169,7 @@ Semver!
 
 * easier to maintain (if it is possible to forget about the apps with old Rubies)
 * it **can be a nightmare** to manage the branches if you need to change something
-in a app with olf Ruby
+in a app with of Ruby
 
 !SLIDE center
 
