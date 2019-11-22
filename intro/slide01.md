@@ -8,7 +8,7 @@
 
 !SLIDE center red
 
-# **Warning:** this talk does not have all the answers you may looking for
+# **Warning:** this talk does not have all the answers you may are looking for
 
 ## Upgrading Ruby can be very difficult sometimes!
 
@@ -21,7 +21,9 @@
 # Why upgrade Ruby?
 
 * Every christmas a new (minor) version of Ruby is released
-* Every march (or february) the last supported minor version reaches the end-of-life (eol)
+* Every march (or february) the last minor version supported reaches the end-of-life (eol)
+* Better performance (speed, GC, etc.)
+* Cool new features (ex: `Kernel#then`)
 
 !SLIDE center
 
@@ -61,6 +63,12 @@
 !SLIDE center red big
 
 # Now, wake up!!
+
+!SLIDE center
+
+## Disclaimer
+
+### If your application has few dependencies and/or has few lines of code, the upgrade can be easy, and this talk is useless for you!
 
 !SLIDE center
 
@@ -107,15 +115,28 @@ Gems are not used to restrict the new versions, examples:
 
 Upgrading from 2.3 to 2.6 **should be** easier than upgrading from 2.3 to 2.4!
 
+!SLIDE center
+
+# 1st steps (easy mode)
+
+- Change the .ruby-version with the new version
+- Run `bundle install`
+- Run the tests
 
 !SLIDE center
 
-# 1st steps
+# If you have no problems, congratulations!!
 
-- check the Gemfile and restrict all gem versions with `'~> M.m'`
-- delete the Gemfile.lock
-- update the .ruby-version with the new version
-- run **bundle install** and PRAY a lot!
+## End of the talk
+
+!SLIDE center
+
+# 1st steps (if you have problems in `easy mode`)
+
+- Change the Gemfile to restrict all gem versions with `'~> M.m'`
+- Delete the Gemfile.lock
+- Update the .ruby-version with the new version
+- Run **bundle install** and PRAY a lot!
 
 !SLIDE center
 
