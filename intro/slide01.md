@@ -10,15 +10,21 @@
 
 # **Warning:** this talk does not have all the answers you may are looking for
 
-## Upgrading Ruby can be very difficult sometimes!
+## Upgrading Ruby can be very difficult sometimes! (or not)
+
+!SLIDE center
+
+## This talk was inspired by a very difficult process of upgrading Ruby we experienced in Locaweb
+
+Thanks to Gabriel Klockner for the help!
+
+![](../_images/gabriel.jpg)
 
 !SLIDE center
 
 # Why upgrade Ruby version? (in an application)
 
 !SLIDE center
-
-# Why upgrade Ruby?
 
 * Every christmas a new (minor) version of Ruby is released
 * Every march (or february) the last minor version supported reaches the end-of-life (eol)
@@ -50,11 +56,19 @@
 
 # What about Rails??
 
+- Upgrading Ruby is a prerequisite to upgrade Rails (normally)
+
 - Rails has a release frequency slower than Ruby
 
 - I will not talk about upgrading Rails in this talk (maybe next year!)
 
-- Upgrading Ruby is a prerequisite to upgrade Rails (normally)
+!SLIDE center
+
+# The chicken and the egg
+
+Warning: there are some issued with EOL versions of Rails and new Rubies, ex: https://github.com/rails/rails/issues/34790
+
+![](../_images/bug_rails.png)
 
 !SLIDE center
 
@@ -72,15 +86,108 @@
 
 !SLIDE center
 
-# 1st problem: **bundle install**
+# 1st steps (easy mode)
+
+- Change the `.ruby-version` with the new version
+- Run `bundle install`
+- Run the tests
 
 !SLIDE center
 
-# 1st problem: **bundle install**
+# If you have no problems, congratulations!!
 
-* Some gems only work on a specific range of Ruby versions
-* Some gems have dependencies which works only on a specific range of Ruby versions
+!SLIDE center
+
+# To have more confidence
+
+- Evaluate the test coverage (simplecov) and maybe increase the test coverage
+
+- Deploy the new version together with old version and compare the error rating of both
+
+!SLIDE center
+
+# Experiments I did to this talk
+
+Upgrading to 2.6.3
+
+| Application | Current Ruby | Number of dependencies | Bundle install ok? | Dificulty to pass all tests |
+| ----------- | ------------ | ---------------------- | ------------------ | ------------- |
+| feed-processor   | 2.2   | 139 | 16609 | yes | easy |
+| criador-de-sites | 2.3.5 | 245 | 42222 | no  | -    |
+| hosting-panel    | 2.4.2 | 156 | 36244 | yes | easy |
+| hosting-services | 2.3.5 | 155 | 55257 | yes | impossible |
+
+loc: `git ls-files | grep .rb | xargs wc -l`
+
+dependencies: `bundle | grep Using | wc -l`
+
+!SLIDE center
+
+# Problems you may have
+
+- Bundle install
+
+- Running the tests
+
+!SLIDE center big
+
+# Bundle install
+
+!SLIDE center
+
+* Some gems (explicit) only work on a specific range of Ruby versions
+* Some gems have dependencies which (explicit) only work on a specific range of Ruby versions
 * Some gems **do not** know they only work on a specific range of Ruby versions or dependencies!
+
+!SLIDE center
+
+## Old gem versions normally does not know they do not work in new Ruby versions!
+
+    @@@text
+    $ ruby -v
+    ruby 2.6.3p62 (2019-04-16 revision 67580) [x86_64-linux]
+    $ gem install oj -v '2.13.1'
+    Building native extensions. This could take a while...
+    ERROR:  Error installing oj:
+            ERROR: Failed to build gem native extension.
+
+https://github.com/ohler55/oj/blob/develop/CHANGELOG.md
+
+    @@@text
+    2.18.0 - 2016-11-26
+        Ready for Ruby 2.4.
+
+Try to find a version wich does not increase the major!
+
+!SLIDE center
+
+# Semver (Semantic Versioning)
+
+https://semver.org
+
+    @@@text
+    Given a version number MAJOR.MINOR.PATCH, increment the:
+
+    MAJOR version when you make incompatible API changes,
+    MINOR version when you add functionality in a backwards compatible manner, and
+    PATCH version when you make backwards compatible bug fixes.
+
+**note1**: Ruby versions **do not** follow Semver, but the majority of the gems
+do!
+
+**note2**: If necessary to upgrade a major version, search for files like
+CHANGELOG.md or RELEASES.md in gem's source to know why the
+compatibility was broken.
+
+**note3**: If you are a gem maintainer, https://keepachangelog.com and follow
+Semver!
+
+!SLIDE center
+
+## It would be great if all the gems specify the Ruby version they know it works, limiting the top and bottom:
+
+    @@@ruby
+    s.required_ruby_version = [">= 2.3", "< 2.7"]
 
 !SLIDE center
 
@@ -117,26 +224,38 @@ Upgrading from 2.3 to 2.6 **should be** easier than upgrading from 2.3 to 2.4!
 
 !SLIDE center
 
-# 1st steps (easy mode)
+## Sometimes it is ok to update directly the Gemfile.lock
 
-- Change the .ruby-version with the new version
-- Run `bundle install`
-- Run the tests
+(but don't tell that I told you to do it!)
+
+- Failure installing gem `oj 2.13.1`
+- Gem `oj` is not defined in Gemfile
+
+Example:
+
+    @@@ruby
+    heartcheck (1.0.8)
+      oj
 
 !SLIDE center
 
-# If you have no problems, congratulations!!
+## 2 options
 
-## End of the talk
+1) Declare as a dependency in Gemfile
 
-!SLIDE center
+Example:
 
-# 1st steps (if you have problems in `easy mode`)
+    @@@ruby
+    # Gemfile
+    gem 'oj', '~> 2.18.5'
 
-- Change the Gemfile to restrict all gem versions with `'~> M.m'`
-- Delete the Gemfile.lock
-- Update the .ruby-version with the new version
-- Run **bundle install** and PRAY a lot!
+2) Change the version in Gemfile.lock
+
+Example:
+
+    @@@diff
+    - oj (2.13.1)
+    + oj (2.18.5)
 
 !SLIDE center
 
@@ -156,107 +275,64 @@ Upgrading from 2.3 to 2.6 **should be** easier than upgrading from 2.3 to 2.4!
 
 It should prevent using a new major version which could break some things.
 
-!SLIDE center red
+!SLIDE center
 
-# How to deal with errors "Bundler could not find compatible versions for..." ?
+## If you a gem maintainer
+
+* Do not specify dependencies with `'M.m.p'` or `'~> M.m.p'`
+
+* **Prefer** `'~> M.m'` or `['>= M.m', '< M.m']`
+
+* Believe in *Semver* and help the others to upgrade their Rubies and gems!
 
 !SLIDE center
 
-![](../_images/resolution_errors.png)
+## Example doing wrong
 
-!SLIDE center
+- A project in ruby 2.3 is using a gem X wich depends on `ox ~> 2.1.3` (2nd level dependency)
+- The gem `ox` supports Ruby 2.6 only in version `>= 2.7`
+- In project's Gemfile it's not possible to set `gem 'ox', '~>  2.7'`
 
-## The error message from bundle is not always clear
+Error:
 
     @@@text
-    Bundler could not find compatible versions for
-    gem "rest_model":
+    Resolving dependencies....
+    Bundler could not find compatible versions for gem "ox":
       In Gemfile:
-        domain_api-client (~> 1.1) was resolved to 1.1.0,
-        which depends on
-          rest_model
-        provisioning-core was resolved to 13.4.0.ruby23,
-        which depends on
-          rest_model (~> 0.2)
-        sapi_client (~> 0.3) was resolved to 0.12.0,
-        which depends on
-          rest_model (>= 0.2)
+        ox (~> 2.7)
 
-What is the problem??
-
-https://github.com/bundler/bundler/issues/6620
+        ws_authentication_client was resolved to 0.0.2, which depends on
+          ox (~> 2.1.3)
 
 !SLIDE center
 
-## How to deal with these errors?
+# And now?
 
-- comment all problematic gems in Gemfile until it is possible to complete `bundle install`
-- uncomment 1 by 1 and try to solve the problems
-- sometimes, deleting the Gemfile.lock again and running **bundle install** can solve problems
-- sometimes it is necessary to add gems to your Gemfile to limit the version of a 2nd level dependency
-- be careful when it's necessary to increment the major of some gem (check the CHANGELOG.md)
-- `goto 1` while there are commented gems on Gemfile!
+## Change the gem X to accept new versions of gem `ox`
 
-!SLIDE center
+Example:
 
-# Semver (Semantic Versioning)
-
-https://semver.org
-
-    @@@text
-    Given a version number MAJOR.MINOR.PATCH, increment the:
-
-    MAJOR version when you make incompatible API changes,
-    MINOR version when you add functionality in a backwards compatible manner, and
-    PATCH version when you make backwards compatible bug fixes.
-
-**note1**: Ruby versions **do not** follow Semver, but the majority of the gems
-do!
-
-**note2**: If necessary to upgrade a major version, search for files like
-CHANGELOG.md or RELEASES.md in gem's source to know why the
-compatibility was broken.
-
-**note3**: If you are a gem maintainer, https://keepachangelog.com and follow
-Semver!
+    @@@diff
+    - spec.add_dependency 'ox', '~> 2.1.3'
+    + spec.add_dependency 'ox', '~> 2.1'
 
 !SLIDE center
 
-# Problem 1.1: **internal gems**
+## Change the build to run the tests in all supported ruby versions
+
+    @@@yaml
+    matrix:
+      include:
+        - rvm: 2.3
+        - rvm: 2.4
+        - rvm: 2.5
+        - rvm: 2.6
 
 !SLIDE center
 
-# Problem 1.1: **internal gems**
+## Maybe it will not work with some Ruby version
 
-## Strategy 1: keep compatibility with old rubies
-## Strategy 2: break compatibility with old rubies
-
-!SLIDE center
-
-## Example of problem which breaks the compatibility
-
-TODO: pensar um exemplo
-- the gem `supergem`  depends on `lalapopo (= 1.6.7)`, and supports only `ruby < 2.4`
-- a project Y depends on gem `supergem` and its using ruby 2.3.5
-- the gem `lalapopo 1.6.7` is not compatible
-- when upgrading the project P to use ruby 2.6.4 it
-
-
-!SLIDE center
-
-## Strategy 1: keep compatibility with old rubies
-
-* allow upgrading the gem even in the projects with old Ruby versions
-* recommended if:
-    + there are **many** projects using the gem.
-    + the gem is constantly updated in projects
-* more complex, it will require some `if RUBY_VERSION > X` in the code
-
-## Strategy 2: break compatibility with old rubies
-
-* easier to maintain (if it is possible to forget about the apps with old Rubies)
-* it **can be a nightmare** to manage the branches if you need to change something
-in a app with of Ruby
+Evaluate if you need this gem working with these old versions which the test fail
 
 !SLIDE center
 
@@ -286,10 +362,59 @@ in a app with of Ruby
 
 ## Strategy 1: keep compatibility with old rubies
 
-- delete the Gemfile.lock from git! (https://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile)
-- set `required_ruby_version` in Gemspec with a range
-- setup the pipeline to run the tests for all supported versions
-- maybe use different Gemfiles to run the tests (to test all supported versions of some gem)
+* Allow upgrading even in projects with old Ruby versions
+* Recommended if:
+    + there are **many** projects using the gem.
+    + the gem is constantly updated in projects
+* Not recommended for public (external) gems
+* It will require some `if RUBY_VERSION` in the code
+
+Example:
+
+    @@@ruby
+    # in .gemspec
+    if RUBY_VERSION < '2.3.0'
+      spec.add_dependency 'ox', '~> 2.1.3'
+    else
+      spec.add_dependency 'ox', '~> 2.1'
+    end
+
+!SLIDE center
+
+## Build the gem for each ruby version
+
+* The .gemspec file is processed when the gem is built (`rake build`)
+* Add the ruby version to the tag to be explicit what version it was build
+
+Example: `13.6.0.ruby23` and `13.6.0.ruby26`
+
+Warning: Doing this, it will not work `gem 'X', '> 13.6'` in Gemfile
+
+!SLIDE center
+
+## Strategy 2: break compatibility with old rubies
+
+* Easier to maintain (if it is possible to forget about the apps with old Rubies)
+
+!SLIDE center
+
+It **can be a nightmare** to manage the branches if you need to change something in older versions
+
+![](../_images/nightmare.png)
+
+!SLIDE center
+
+## Good practices for gem projects
+
+* Delete the Gemfile.lock from git! (https://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile)
+
+* Set `required_ruby_version` in Gemspec with a range
+
+* Setup the pipeline to run the tests for all supported versions
+
+* Maybe use different Gemfiles to run the tests (to test all supported versions of some gem)
+
+* Only add a new one if it is **really** necessary!
 
 !SLIDE center
 
@@ -298,8 +423,6 @@ in a app with of Ruby
     @@@yaml
     matrix:
       include:
-        - rvm: "2.2.1"
-          gemfile: Gemfile-old-ruby
         - rvm: "2.2.2"
         - rvm: "2.3.0"
         - rvm: "2.3.3"
@@ -327,28 +450,31 @@ This gem has a dependency with the gem Redis:
 
 !SLIDE center
 
-# To avoid problems with a gem project:
+## The error message from bundle is not always clear
 
-- be compatible with a range of Ruby versions (and test them in the build)
-- for dependencies:
-    + be compatible with a range of versions (and test them in the build)
-    + only add a new one if it is **really** necessary!
+    @@@text
+    Bundler could not find compatible versions for
+    gem "rest_model":
+      In Gemfile:
+        domain_api-client (~> 1.1) was resolved to 1.1.0,
+        which depends on
+          rest_model
+        provisioning-core was resolved to 13.4.0.ruby23,
+        which depends on
+          rest_model (~> 0.2)
+        sapi_client (~> 0.3) was resolved to 0.12.0,
+        which depends on
+          rest_model (>= 0.2)
+
+What is the problem??
+
+https://github.com/bundler/bundler/issues/6620
+
 
 !SLIDE
 
-- fizemos essas anotações quando estavamos atualizando o ruby de umas aplicações
-- mencionar o kloquinho que é co-author "ghost" dessa palestra
-- problem 1.1 internal gems may support different versions of ruby
-- corrija todas as gems internas para suportar o ruby novo, e se possivel o
-velho ao mesmo tempo. Com isso, da pra seguir com as atualizações nas 2 versões
-    + se houver IF ruby_version no gemspec, usar o nome do ruby pra indicar como foi o build, ex: r13.0.0.ruby26
 - dependencias externas podem atrapalhar na evolução, por exemplo versão do banco
 de dados ou do redis
-- algumas gems podem estar amarradas a versoes especificas de outras gems
-```
--  s.add_runtime_dependency 'activesupport', '~> 5.1.4'
-+  s.add_runtime_dependency 'activesupport', '~> 3.2'
-```
 - problem 2: fazer os testes passarem
 - arrume os warnings, ex:
 ```
