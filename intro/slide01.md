@@ -22,7 +22,8 @@ Thanks to Gabriel Klockner for the help!
 
 !SLIDE center
 
-# Why upgrade Ruby version? (in an application)
+# Why upgrade Ruby version?
+## (in an application)
 
 !SLIDE center
 
@@ -86,6 +87,21 @@ Warning: there are some issued with EOL versions of Rails and new Rubies, ex: ht
 
 !SLIDE center
 
+## Experiments I did upgrading to 2.6.3
+
+| Application | Current Ruby | Number of dependencies | LOC | Bundle install ok? | Dificulty to pass all tests |
+| ----------- | ------------ | ---------------------- | ----| ------------------ | ------------- |
+| feed-processor   | 2.2   | 139 | 16.609 | yes | easy |
+| criador-de-sites | 2.3.5 | 245 | 42.222 | no  | -    |
+| hosting-panel    | 2.4.2 | 156 | 36.244 | yes | easy |
+| hosting-services | 2.3.5 | 155 | 55.257 | yes | **impossible** |
+
+LOC: `git ls-files | grep .rb | xargs wc -l`
+
+Number of dependencies: `bundle | grep Using | wc -l`
+
+!SLIDE center
+
 # 1st steps (easy mode)
 
 - Change the `.ruby-version` with the new version
@@ -102,24 +118,7 @@ Warning: there are some issued with EOL versions of Rails and new Rubies, ex: ht
 
 - Evaluate the test coverage (simplecov) and maybe increase the test coverage
 
-- Deploy the new version together with old version and compare the error rating of both
-
-!SLIDE center
-
-# Experiments I did to this talk
-
-Upgrading to 2.6.3
-
-| Application | Current Ruby | Number of dependencies | Bundle install ok? | Dificulty to pass all tests |
-| ----------- | ------------ | ---------------------- | ------------------ | ------------- |
-| feed-processor   | 2.2   | 139 | 16609 | yes | easy |
-| criador-de-sites | 2.3.5 | 245 | 42222 | no  | -    |
-| hosting-panel    | 2.4.2 | 156 | 36244 | yes | easy |
-| hosting-services | 2.3.5 | 155 | 55257 | yes | impossible |
-
-loc: `git ls-files | grep .rb | xargs wc -l`
-
-dependencies: `bundle | grep Using | wc -l`
+- Deploy the new version together with the old version (under a load balancer) and compare the error rating of both
 
 !SLIDE center
 
@@ -135,13 +134,13 @@ dependencies: `bundle | grep Using | wc -l`
 
 !SLIDE center
 
-* Some gems (explicit) only work on a specific range of Ruby versions
-* Some gems have dependencies which (explicit) only work on a specific range of Ruby versions
+* Some gems only work on a specific range of Ruby versions
+* Some gems have dependencies which only work on a specific range of Ruby versions
 * Some gems **do not** know they only work on a specific range of Ruby versions or dependencies!
 
 !SLIDE center
 
-## Old gem versions normally does not know they do not work in new Ruby versions!
+## Old gem versions normally don't know they don't work in new Ruby versions!
 
     @@@text
     $ ruby -v
@@ -184,7 +183,7 @@ Semver!
 
 !SLIDE center
 
-## It would be great if all the gems specify the Ruby version they know it works, limiting the top and bottom:
+## It would be great if all the gems specify the Ruby version they know it works, limiting the top and bottom
 
     @@@ruby
     s.required_ruby_version = [">= 2.3", "< 2.7"]
@@ -239,9 +238,9 @@ Example:
 
 !SLIDE center
 
-## 2 options
+## 2 options to fix
 
-1) Declare as a dependency in Gemfile
+1) Set as a dependency in Gemfile
 
 Example:
 
@@ -259,7 +258,7 @@ Example:
 
 !SLIDE center
 
-## Why restrict the versions with `'~> M.m'` ?
+## Restrict the versions with `'~> M.m'` ?
 
     @@@ruby
     # example of a gem without version specification in
@@ -308,7 +307,7 @@ Error:
 
 # And now?
 
-## Change the gem X to accept new versions of gem `ox`
+### Change the gem X to accept new versions of gem `ox`
 
 Example:
 
@@ -330,9 +329,9 @@ Example:
 
 !SLIDE center
 
-## Maybe it will not work with some Ruby version
+## Maybe it won't work with some Ruby versions
 
-Evaluate if you need this gem working with these old versions which the test fail
+Evaluate if you need this gem working with these old versions which the tests fail
 
 !SLIDE center
 
@@ -365,7 +364,7 @@ Evaluate if you need this gem working with these old versions which the test fai
 * Allow upgrading even in projects with old Ruby versions
 * Recommended if:
     + there are **many** projects using the gem.
-    + the gem is constantly updated in projects
+    + the gem is **constantly updated** in projects
 * Not recommended for public (external) gems
 * It will require some `if RUBY_VERSION` in the code
 
@@ -388,13 +387,13 @@ Example:
 
 Example: `13.6.0.ruby23` and `13.6.0.ruby26`
 
-Warning: Doing this, it will not work `gem 'X', '> 13.6'` in Gemfile
+**Warning**: Doing this, it will not work `gem 'X', '> 13.6'` in Gemfile
 
 !SLIDE center
 
 ## Strategy 2: break compatibility with old rubies
 
-* Easier to maintain (if it is possible to forget about the apps with old Rubies)
+* Easier to maintain
 
 !SLIDE center
 
@@ -404,17 +403,17 @@ It **can be a nightmare** to manage the branches if you need to change something
 
 !SLIDE center
 
-## Good practices for gem projects
+# Good practices for gem projects
 
-* Delete the Gemfile.lock from git! (https://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile)
+* Remove the Gemfile.lock from git (https://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile)
 
 * Set `required_ruby_version` in Gemspec with a range
 
 * Setup the pipeline to run the tests for all supported versions
 
-* Maybe use different Gemfiles to run the tests (to test all supported versions of some gem)
+* Use different Gemfiles to run the tests (to test all supported versions of some gem)
 
-* Only add a new one if it is **really** necessary!
+* Only add dependencies if it is **really** necessary!
 
 !SLIDE center
 
