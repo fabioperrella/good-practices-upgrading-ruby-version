@@ -67,7 +67,7 @@ Thanks to Gabriel Klockner for the help!
 
 # The chicken and the egg
 
-Warning: there are some issued with EOL versions of Rails and new Rubies, ex: https://github.com/rails/rails/issues/34790
+Warning: there are some issues with EOL versions of Rails and new Rubies, ex: https://github.com/rails/rails/issues/34790
 
 ![](../_images/bug_rails.png)
 
@@ -128,6 +128,8 @@ Number of dependencies: `bundle | grep Using | wc -l`
 
 - Running the tests
 
+- Deploy
+
 !SLIDE center big
 
 # Bundle install
@@ -145,6 +147,7 @@ Number of dependencies: `bundle | grep Using | wc -l`
     @@@text
     $ ruby -v
     ruby 2.6.3p62 (2019-04-16 revision 67580) [x86_64-linux]
+
     $ gem install oj -v '2.13.1'
     Building native extensions. This could take a while...
     ERROR:  Error installing oj:
@@ -156,7 +159,38 @@ https://github.com/ohler55/oj/blob/develop/CHANGELOG.md
     2.18.0 - 2016-11-26
         Ready for Ruby 2.4.
 
-Try to find a version wich does not increase the major!
+Try to find a version within the same major!
+
+!SLIDE center
+
+## It would be great if all the gems specify the Ruby version they know it works, limiting the top and bottom
+
+    @@@ruby
+    s.required_ruby_version = [">= 2.3", "< 2.7"]
+
+!SLIDE center
+
+## When trying to upgrade a gem verion
+
+Sometimes the error message from bundle is not so clear
+
+    @@@text
+    Bundler could not find compatible versions for
+    gem "rest_model":
+      In Gemfile:
+        domain_api-client (~> 1.1) was resolved to 1.1.0,
+        which depends on
+          rest_model
+        provisioning-core was resolved to 13.4.0.ruby23,
+        which depends on
+          rest_model (~> 0.2)
+        sapi_client (~> 0.3) was resolved to 0.12.0,
+        which depends on
+          rest_model (>= 0.2)
+
+What is the problem??
+
+https://github.com/bundler/bundler/issues/6620
 
 !SLIDE center
 
@@ -180,13 +214,6 @@ compatibility was broken.
 
 **note3**: If you are a gem maintainer, https://keepachangelog.com and follow
 Semver!
-
-!SLIDE center
-
-## It would be great if all the gems specify the Ruby version they know it works, limiting the top and bottom
-
-    @@@ruby
-    s.required_ruby_version = [">= 2.3", "< 2.7"]
 
 !SLIDE center
 
@@ -278,7 +305,9 @@ It should prevent using a new major version which could break some things.
 
 ## If you a gem maintainer
 
-* Do not specify dependencies with `'M.m.p'` or `'~> M.m.p'`
+* Do not specify dependencies with `'= M.m.p'` or `'~> M.m.p'`
+
+* Be careful with `'>= M.m.p'` or `'> M.m.p'`
 
 * **Prefer** `'~> M.m'` or `['>= M.m', '< M.m']`
 
@@ -286,9 +315,9 @@ It should prevent using a new major version which could break some things.
 
 !SLIDE center
 
-## Example doing wrong
+## Example based on a real problem
 
-- A project in ruby 2.3 is using a gem X wich depends on `ox ~> 2.1.3` (2nd level dependency)
+- A project in ruby 2.3 is using the gem `ws_authentication_client` wich depends on `ox ~> 2.1.3` (2nd level dependency)
 - The gem `ox` supports Ruby 2.6 only in version `>= 2.7`
 - In project's Gemfile it's not possible to set `gem 'ox', '~>  2.7'`
 
@@ -307,7 +336,7 @@ Error:
 
 # And now?
 
-### Change the gem X to accept new versions of gem `ox`
+### Change the gem `ws_authentication_client` to accept new versions of gem `ox`
 
 Example:
 
@@ -317,7 +346,7 @@ Example:
 
 !SLIDE center
 
-## Change the build to run the tests in all supported ruby versions
+## Change the build to run the tests in all supported Ruby versions
 
     @@@yaml
     matrix:
@@ -329,9 +358,53 @@ Example:
 
 !SLIDE center
 
-## Maybe it won't work with some Ruby versions
+## If necessary, use different ruby versions and Gemfiles
 
-Evaluate if you need this gem working with these old versions which the tests fail
+    @@@yaml
+    matrix:
+      include:
+        - rvm: "2.2.2"
+        - rvm: "2.3.0"
+        - rvm: "2.3.3"
+        - rvm: 2.4
+        - rvm: 2.4
+          gemfile: Gemfile-redis-3
+        - rvm: 2.4
+          gemfile: Gemfile-redis-4
+        - rvm: 2.5
+        - rvm: 2.5
+          gemfile: Gemfile-redis-3
+
+https://github.com/locaweb/heartcheck-sidekiq/blob/master/.travis.yml
+
+!SLIDE center
+
+# Different Gemfiles
+
+This gem has a dependency with the gem Redis:
+
+    @@@ruby
+    spec.add_dependency 'redis', '>= 3.2.0', '< 5'
+
+![](../_images/gemfilediff.png)
+
+!SLIDE center
+
+## Then you discover the gem doesn't work with some Ruby versions
+
+Do you need to keep this gem updated in projects with old versions of Ruby?
+
+!SLIDE center
+
+## This gem can be a dependency of some projects
+
+Assuming the new verions of the gem will compatible only with `ruby >= 2.4`
+
+| Project name    | Ruby version  | Can upgrade the gem ? |
+| ----------------| ------------- | --------------------- |
+| nsa             | 2.3           | **No**  |
+| hosting-panel   | 2.4           | Yes |
+| recipes-managed | 2.6           | Yes |
 
 !SLIDE center
 
@@ -382,8 +455,8 @@ Example:
 
 ## Build the gem for each ruby version
 
-* The .gemspec file is processed when the gem is built (`rake build`)
-* Add the ruby version to the tag to be explicit what version it was build
+* The `.gemspec` is processed when the gem is built (`rake build`)
+* Add the ruby version to the tag to be explicit to what version it was built for
 
 Example: `13.6.0.ruby23` and `13.6.0.ruby26`
 
@@ -393,11 +466,12 @@ Example: `13.6.0.ruby23` and `13.6.0.ruby26`
 
 ## Strategy 2: break compatibility with old rubies
 
-* Easier to maintain
+* Cleaner code
+* It is possible to forget old Rubies
 
 !SLIDE center
 
-It **can be a nightmare** to manage the branches if you need to change something in older versions
+But it **can be a nightmare** to manage the branches if you need to change something in older versions
 
 ![](../_images/nightmare.png)
 
@@ -405,7 +479,7 @@ It **can be a nightmare** to manage the branches if you need to change something
 
 # Good practices for gem projects
 
-* Remove the Gemfile.lock from git (https://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile)
+* Do not check `Gemfile.lock` into git (https://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile)
 
 * Set `required_ruby_version` in Gemspec with a range
 
@@ -415,63 +489,22 @@ It **can be a nightmare** to manage the branches if you need to change something
 
 * Only add dependencies if it is **really** necessary!
 
-!SLIDE center
+* https://keepachangelog.com and follow Semver!
 
-## Example with different ruby versions and Gemfiles
+!SLIDE center big
 
-    @@@yaml
-    matrix:
-      include:
-        - rvm: "2.2.2"
-        - rvm: "2.3.0"
-        - rvm: "2.3.3"
-        - rvm: 2.4
-        - rvm: 2.4
-          gemfile: Gemfile-redis-3
-        - rvm: 2.4
-          gemfile: Gemfile-redis-4
-        - rvm: 2.5
-        - rvm: 2.5
-          gemfile: Gemfile-redis-3
-
-https://github.com/locaweb/heartcheck-sidekiq/blob/master/.travis.yml
+# Running the tests
 
 !SLIDE center
 
-# Different Gemfiles
+## Maybe some tests will start to fail
 
-This gem has a dependency with the gem Redis:
-
-    @@@ruby
-    spec.add_dependency 'redis', '>= 3.2.0', '< 5'
-
-![](../_images/gemfilediff.png)
-
-!SLIDE center
-
-## The error message from bundle is not always clear
-
-    @@@text
-    Bundler could not find compatible versions for
-    gem "rest_model":
-      In Gemfile:
-        domain_api-client (~> 1.1) was resolved to 1.1.0,
-        which depends on
-          rest_model
-        provisioning-core was resolved to 13.4.0.ruby23,
-        which depends on
-          rest_model (~> 0.2)
-        sapi_client (~> 0.3) was resolved to 0.12.0,
-        which depends on
-          rest_model (>= 0.2)
-
-What is the problem??
-
-https://github.com/bundler/bundler/issues/6620
-
+* Check if they were passing in master branch (with the same seed)
 
 !SLIDE
 
+- as vezes será necessário fazer monkey patch em gems com versões depreciadas, ex rails 4.2
+- é melhor fazer monkey patch com module prepend
 - dependencias externas podem atrapalhar na evolução, por exemplo versão do banco
 de dados ou do redis
 - problem 2: fazer os testes passarem
