@@ -153,13 +153,41 @@ Number of dependencies: `bundle | grep Using | wc -l`
     ERROR:  Error installing oj:
             ERROR: Failed to build gem native extension.
 
+!SLIDE center
+
+## Test the latest version within the same major
+
+Example: https://rubygems.org/gems/oj/versions
+
+    @@@text
+    ...
+    3.0.1 - April 25, 2017 (172 KB)
+    3.0.0 - April 25, 2017 (172 KB)
+    2.18.5 - March 22, 2017 (125 KB)   # <------- try this !
+    2.18.4 - March 22, 2017 (128 KB)
+    2.18.3 - March 15, 2017 (124 KB)
+    2.18.2 - March 02, 2017 (125 KB)
+    2.18.1 - January 13, 2017 (123 KB)
+    2.18.0 - November 26, 2016 (123 KB)
+    2.15.0 - March 28, 2016 (118 KB)
+    ...
+    2.14.3 - December 31, 2015 (117 KB)
+    2.14.2 - December 19, 2015 (116 KB)
+    2.14.1 - December 15, 2015 (116 KB)
+    2.14.0 - December 05, 2015 (116 KB)
+    2.13.1 - November 16, 2015 (115 KB)  # <--- current version
+    ...
+
+!SLIDE center
+
+## Or try to search in CHANGELOG when it started to support some Ruby version
+
 https://github.com/ohler55/oj/blob/develop/CHANGELOG.md
 
     @@@text
     2.18.0 - 2016-11-26
         Ready for Ruby 2.4.
 
-Try to find a version within the same major!
 
 !SLIDE center
 
@@ -254,8 +282,8 @@ Upgrading from 2.3 to 2.6 **should be** easier than upgrading from 2.3 to 2.4!
 
 (but don't tell that I told you to do it!)
 
-- Failure installing gem `oj 2.13.1`
-- Gem `oj` is not defined in Gemfile
+- Failure installing gem `oj 2.13.1` with Ruby 2.6.3
+- Gem `oj` is not defined in Gemfile (it's a 2nd lever dependency)
 
 Example:
 
@@ -283,6 +311,8 @@ Example:
     - oj (2.13.1)
     + oj (2.18.5)
 
+3) Is there a better way??
+
 !SLIDE center
 
 ## Restrict the versions with `'~> M.m'` ?
@@ -307,9 +337,9 @@ It should prevent using a new major version which could break some things.
 
 * Do not specify dependencies with `'= M.m.p'` or `'~> M.m.p'`
 
-* Be careful with `'>= M.m.p'` or `'> M.m.p'`
+* Be careful with `'>= X'` or `'> X'`
 
-* **Prefer** `'~> M.m'` or `['>= M.m', '< M.m']`
+* **Prefer** `'~> M.m'` or `['>= X', '< X']`
 
 * Believe in *Semver* and help the others to upgrade their Rubies and gems!
 
@@ -434,7 +464,7 @@ Assuming the new verions of the gem will compatible only with `ruby >= 2.4`
 
 ## Strategy 1: keep compatibility with old rubies
 
-* Allow upgrading even in projects with old Ruby versions
+* Allow projects with old Ruby versions upgrading the gem
 * Recommended if:
     + there are **many** projects using the gem.
     + the gem is **constantly updated** in projects
@@ -453,7 +483,7 @@ Example:
 
 !SLIDE center
 
-## Build the gem for each ruby version
+## Build and publish the gem for each ruby version
 
 * The `.gemspec` is processed when the gem is built (`rake build`)
 * Add the ruby version to the tag to be explicit to what version it was built for
@@ -499,7 +529,9 @@ But it **can be a nightmare** to manage the branches if you need to change somet
 
 ## Maybe some tests will start to fail
 
-* Check if they were passing in master branch (with the same seed)
+* Check if they were ok in master branch (with the same seed)
+
+* Debug
 
 !SLIDE
 
