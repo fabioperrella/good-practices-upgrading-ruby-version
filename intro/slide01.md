@@ -118,6 +118,8 @@ Number of dependencies: `bundle | grep Using | wc -l`
 
 - Evaluate the test coverage (simplecov) and maybe increase the test coverage
 
+- Be careful with stubbed tests
+
 - Deploy the new version together with the old version (under a load balancer) and compare the error rating of both
 
 !SLIDE center
@@ -133,6 +135,30 @@ Number of dependencies: `bundle | grep Using | wc -l`
 !SLIDE center big
 
 # Bundle install
+
+!SLIDE center
+
+# Semver (Semantic Versioning)
+
+https://semver.org
+
+    @@@text
+    Given a version number MAJOR.MINOR.PATCH, increment the:
+
+    MAJOR version when you make incompatible API changes,
+    MINOR version when you add functionality in a backwards compatible manner, and
+    PATCH version when you make backwards compatible bug fixes.
+
+**note1**: Ruby versions **do not** follow Semver, but the majority of the gems
+do!
+
+**note2**: If necessary to upgrade a major version, search for files like
+CHANGELOG.md or RELEASES.md in gem's source to know why the
+compatibility was broken.
+
+**note3**: If you are a gem maintainer, https://keepachangelog.com and follow
+Semver!
+
 
 !SLIDE center
 
@@ -222,29 +248,6 @@ https://github.com/bundler/bundler/issues/6620
 
 !SLIDE center
 
-# Semver (Semantic Versioning)
-
-https://semver.org
-
-    @@@text
-    Given a version number MAJOR.MINOR.PATCH, increment the:
-
-    MAJOR version when you make incompatible API changes,
-    MINOR version when you add functionality in a backwards compatible manner, and
-    PATCH version when you make backwards compatible bug fixes.
-
-**note1**: Ruby versions **do not** follow Semver, but the majority of the gems
-do!
-
-**note2**: If necessary to upgrade a major version, search for files like
-CHANGELOG.md or RELEASES.md in gem's source to know why the
-compatibility was broken.
-
-**note3**: If you are a gem maintainer, https://keepachangelog.com and follow
-Semver!
-
-!SLIDE center
-
 # How a gem specifies the required Ruby version
 
     @@@ruby
@@ -283,7 +286,7 @@ Upgrading from 2.3 to 2.6 **should be** easier than upgrading from 2.3 to 2.4!
 (but don't tell that I told you to do it!)
 
 - Failure installing gem `oj 2.13.1` with Ruby 2.6.3
-- Gem `oj` is not defined in Gemfile (it's a 2nd lever dependency)
+- Gem `oj` is not defined in Gemfile (it's a 2nd level dependency)
 
 Example:
 
@@ -311,7 +314,7 @@ Example:
     - oj (2.13.1)
     + oj (2.18.5)
 
-3) Is there a better way??
+3) Is there a better way?? (TODO: talvez apagar a gem do Gemfile)
 
 !SLIDE center
 
