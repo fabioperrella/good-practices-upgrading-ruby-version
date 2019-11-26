@@ -14,12 +14,6 @@
 
 * There are foreign people in the conference
 
-!SLIDE center red
-
-# **Warning:** this talk does not have all the answers you may are looking for
-
-## Upgrading Ruby can be very difficult sometimes! (or not)
-
 !SLIDE center
 
 ## This talk was inspired by a very difficult process of upgrading Ruby we experienced in Locaweb
@@ -81,6 +75,22 @@ Warning: there are some issues with EOL versions of Rails and new Rubies, ex: ht
 
 !SLIDE center
 
+## Rails (and maybe all the gems) doesn't have a matrix to say what Ruby version is compatible with each version
+
+!SLIDE center
+
+## It would be great something like this
+
+| Rails version | Compatible Rubies |
+| ------------- | ----------------- |
+| 6.0           | >= 2.4, < 2.7     |
+| 5.2           | >= 2.4, < 2.7     |
+| 5.1           | >= 2.4, < 2.7     |
+| 4.2           | >= 2.4, < 2.6     |
+| 3.2           | >= 2.3, < 2.4     |
+
+!SLIDE center
+
 ## Imagine a perfect world when you upgrade the Ruby version and all the tests pass in the 1st attempt...
 
 !SLIDE center red big
@@ -134,7 +144,7 @@ Number of dependencies: `bundle | grep Using | wc -l`
 
 # Problems you may have
 
-- Bundle install
+- Bundle install (the focus of this talk)
 
 - Running the tests
 
@@ -232,9 +242,9 @@ https://github.com/ohler55/oj/blob/develop/CHANGELOG.md
 
 !SLIDE center
 
-## When trying to upgrade a gem verion
+## When trying to upgrade a gem version
 
-Sometimes the error message from bundle is not so clear
+Sometimes the error message from Bundler is not so clear
 
     @@@text
     Bundler could not find compatible versions for
@@ -250,7 +260,7 @@ Sometimes the error message from bundle is not so clear
         which depends on
           rest_model (>= 0.2)
 
-What is the problem??
+?? What is the problem ??
 
 https://github.com/bundler/bundler/issues/6620
 
@@ -304,7 +314,7 @@ Example:
 
 !SLIDE center
 
-## 2 options to fix
+## 2 options to fix it
 
 1) Set as a dependency in Gemfile
 
@@ -340,7 +350,7 @@ Example:
     # major upgrade:
     gem 'aasm', '~> 4.12'
 
-It should prevent using a new major version which could break some things.
+It should prevent `bundle upgrade` from  using a new major version which could break some things.
 
 !SLIDE center
 
@@ -548,28 +558,111 @@ But it **can be a nightmare** to manage the branches if you need to change somet
 
 Example: https://github.com/rails/rails/issues/34790
 
-!SLIDE
+    @@@ruby
+    if RUBY_VERSION>='2.6.0'
+      if Rails.version < '5'
+        class ActionController::TestResponse < ActionDispatch::TestResponse
+          def recycle!
+            # hack to avoid MonitorMixin double-initialize error:
+            @mon_mutex_owner_object_id = nil
+            @mon_mutex = nil
+            initialize
+          end
+        end
+      else
+        puts "Monkeypatch for ActionController::TestResponse no longer needed"
+      end
+    end
 
-- as vezes será necessário fazer monkey patch em gems com versões depreciadas, ex rails 4.2
-- é melhor fazer monkey patch com module prepend
-- dependencias externas podem atrapalhar na evolução, por exemplo versão do banco
-de dados ou do redis
-- problem 2: fazer os testes passarem
-- arrume os warnings, ex:
-```
--        expect(WebMock).to_not have_requested(:post, %r|lala/new?*|)
-+        expect(WebMock).to_not have_requested(:post, %r|lala/new\?*|)
-```
-- problema 3: fazer o deploy funcionar
+!SLIDE center
+
+## Why it is acceptable?
+
+* It will warn when it is not required anymore
+
+* Affects only the test environment
+
+* It's not a good idea fork rails4.2 (actually some gem `active-blabla`)
 
 
-!SLIDE
+!SLIDE center
+
+## A better way to apply a monkey patch
+
+    @@@ruby
+    module TestResponseExtension
+      def recycle!
+        # hack to avoid MonitorMixin double-initialize error:
+        @mon_mutex_owner_object_id = nil
+        @mon_mutex = nil
+        initialize
+      end
+    end
+
+    class ActionController::TestResponse
+      prepend TestResponseExtension
+    end
+
+!SLIDE center
+
+## Debugging a broken test, you may discover it will be necessary to upgrade some gem
+
+!SLIDE center
+
+## Try to fix the warnings and let the Rspec output clean
+
+!SLIDE center
+
+# External dependencies can block your upgrade!
+
+* Database
+
+* Redis
+
+* Kakfa
+
+* Etc..
+
+!SLIDE center
+
+## Example
+
+* Activerecord v4 is not compatible with sqlserver 2008
+
+* It must upgrade the database
+
+* Remeber the problem "The chicken and the egg"
+
+* Maybe it will be necessary to release the new database together with the new
+Ruby
+
+!SLIDE center
+
+# Going to production
+
+!SLIDE center
+
+## It's time to upgrade the SO too!
+
+* Luck you if using Docker (or containers)
+
+* Request new servers if using VMs (assuming you don't use rbenv/rvm on production)
+
+* Be careful with system dependencies versions (ex: libxml2).
+
+!SLIDE center
 
 # Finish him! Questions??
 
+TODO: gerar QRCODE feedfack form
+
+## Feedback form
+
+!SLIDE center
+
 ## Picks
 
-The source of this presentation: https://github.com/fabioperrella/debugging-with-mastery
+The source of this presentation: https://github.com/fabioperrella/good-practices-upgrading-ruby-version
 
 This presentation was made with the gem **Showoff**: https://github.com/puppetlabs/showoff
 
