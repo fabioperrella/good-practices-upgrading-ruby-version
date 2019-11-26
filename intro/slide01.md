@@ -6,6 +6,14 @@
 
 ### Tech Leader @ Locaweb
 
+!SLIDE center
+
+# Why this talk is in English?
+
+* Maybe I will try an international conference
+
+* There are foreign people in the conference
+
 !SLIDE center red
 
 # **Warning:** this talk does not have all the answers you may are looking for
@@ -314,7 +322,7 @@ Example:
     - oj (2.13.1)
     + oj (2.18.5)
 
-3) Is there a better way?? (TODO: talvez apagar a gem do Gemfile)
+3) Is there a better way??
 
 !SLIDE center
 
@@ -534,7 +542,11 @@ But it **can be a nightmare** to manage the branches if you need to change somet
 
 * Check if they were ok in master branch (with the same seed)
 
-* Debug
+!SLIDE center
+
+## Sometimes a monkey patch is acceptable
+
+Example: https://github.com/rails/rails/issues/34790
 
 !SLIDE
 
