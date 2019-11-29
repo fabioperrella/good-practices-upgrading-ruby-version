@@ -29,7 +29,7 @@ Thanks to Gabriel Klockner for the help!
 
 !SLIDE center
 
-* Every christmas a new (minor) version of Ruby is released
+* Every xmas a new (minor) version of Ruby is released
 * Every march (or february) the last minor version supported reaches the end-of-life (eol)
 * Better performance (speed, GC, etc.)
 * Cool new features (ex: `Kernel#then`)
@@ -75,7 +75,7 @@ Warning: there are some issues with EOL versions of Rails and new Rubies, ex: ht
 
 !SLIDE center
 
-## Rails (and maybe all the gems) doesn't have a matrix to say what Ruby version is compatible with each version
+## Rails and the most of the gems don't have a table to say what Ruby version is compatible with each version
 
 !SLIDE center
 
@@ -88,6 +88,20 @@ Warning: there are some issues with EOL versions of Rails and new Rubies, ex: ht
 | 5.1           | >= 2.4, < 2.7     |
 | 4.2           | >= 2.4, < 2.6     |
 | 3.2           | >= 2.3, < 2.4     |
+
+!SLIDE center
+
+# Rails Guides only shows the minimum Ruby versions
+
+    @@@text
+    1.3 Ruby Versions
+
+    Rails 6 requires Ruby 2.5.0 or newer.
+    Rails 5 requires Ruby 2.2.2 or newer.
+    Rails 4 prefers Ruby 2.0 and requires 1.9.3 or newer.
+    Rails 3.2.x is the last branch to support Ruby 1.8.7.
+    Rails 3 and above require Ruby 1.8.7 or higher....
+
 
 !SLIDE center
 
@@ -134,7 +148,7 @@ Number of dependencies: `bundle | grep Using | wc -l`
 
 # To have more confidence
 
-- Evaluate the test coverage (simplecov) and maybe increase the test coverage
+- Evaluate the test coverage (simplecov) and increase the test coverage if necessary
 
 - Be careful with stubbed tests
 
@@ -199,7 +213,7 @@ Semver!
 
 !SLIDE center
 
-## Test the latest version within the same major
+## Try the latest version within the same major
 
 Example: https://rubygems.org/gems/oj/versions
 
@@ -242,9 +256,7 @@ https://github.com/ohler55/oj/blob/develop/CHANGELOG.md
 
 !SLIDE center
 
-## When trying to upgrade a gem version
-
-Sometimes the error message from Bundler is not so clear
+## Sometimes the error message from Bundler is not so clear
 
     @@@text
     Bundler could not find compatible versions for
@@ -354,7 +366,7 @@ It should prevent `bundle upgrade` from  using a new major version which could b
 
 !SLIDE center
 
-## If you a gem maintainer
+## If you are a gem maintainer
 
 * Do not specify dependencies with `'= M.m.p'` or `'~> M.m.p'`
 
@@ -368,7 +380,7 @@ It should prevent `bundle upgrade` from  using a new major version which could b
 
 ## Example based on a real problem
 
-- A project in ruby 2.3 is using the gem `ws_authentication_client` wich depends on `ox ~> 2.1.3` (2nd level dependency)
+- A project with ruby 2.3 is using the gem `ws_authentication_client` wich depends on `ox ~> 2.1.3` (2nd level dependency)
 - The gem `ox` supports Ruby 2.6 only in version `>= 2.7`
 - In project's Gemfile it's not possible to set `gem 'ox', '~>  2.7'`
 
@@ -397,7 +409,7 @@ Example:
 
 !SLIDE center
 
-## Change the build to run the tests in all supported Ruby versions
+## Change the pipeline to run the tests for all supported Ruby versions
 
     @@@yaml
     matrix:
@@ -409,7 +421,7 @@ Example:
 
 !SLIDE center
 
-## If necessary, use different ruby versions and Gemfiles
+## If necessary, use different Ruby versions and Gemfiles
 
     @@@yaml
     matrix:
@@ -518,11 +530,11 @@ Example: `13.6.0.ruby23` and `13.6.0.ruby26`
 ## Strategy 2: break compatibility with old rubies
 
 * Cleaner code
-* It is possible to forget old Rubies
+* It is possible to forget about old Rubies
 
 !SLIDE center
 
-But it **can be a nightmare** to manage the branches if you need to change something in older versions
+But it **can be a nightmare** to manage the branches if you need to change something in older versions!
 
 ![](../_images/nightmare.png)
 
@@ -538,9 +550,34 @@ But it **can be a nightmare** to manage the branches if you need to change somet
 
 * Use different Gemfiles to run the tests (to test all supported versions of some gem)
 
-* Only add dependencies if it is **really** necessary!
+* **Only add dependencies if it is really necessary!**
 
 * https://keepachangelog.com and follow Semver!
+
+!SLIDE center
+
+# Keep a Changelog
+
+    @@@text
+    # Changelog
+    All notable changes to this project will be documented in this file.
+
+    ## [1.0.0] - 2017-06-20
+    ### Added
+    - New visual identity by [@tylerfortune8](https://github.com/tylerfortune8).
+    - Ukrainian translation from [@osadchyi-s](https://github.com/osadchyi-s).
+
+    ### Changed
+    - Start using "changelog" over "change log" since it's the common usage.
+    - Fix phrasing and spelling in German translation.
+
+    ### Removed
+    - Section about "changelog" vs "CHANGELOG".
+
+    ## [0.3.0] - 2015-12-03
+    ### Added
+    - RU translation from [@aishek](https://github.com/aishek).
+    - pt-BR translation from [@tallesl](https://github.com/tallesl).
 
 !SLIDE center big
 
@@ -550,7 +587,7 @@ But it **can be a nightmare** to manage the branches if you need to change somet
 
 ## Maybe some tests will start to fail
 
-* Check if they were ok in master branch (with the same seed)
+* Check if they are OK in master branch (with the same seed)
 
 !SLIDE center
 
@@ -582,26 +619,7 @@ Example: https://github.com/rails/rails/issues/34790
 
 * Affects only the test environment
 
-* It's not a good idea fork rails4.2 (actually some gem `active-blabla`)
-
-
-!SLIDE center
-
-## A better way to apply a monkey patch
-
-    @@@ruby
-    module TestResponseExtension
-      def recycle!
-        # hack to avoid MonitorMixin double-initialize error:
-        @mon_mutex_owner_object_id = nil
-        @mon_mutex = nil
-        initialize
-      end
-    end
-
-    class ActionController::TestResponse
-      prepend TestResponseExtension
-    end
+* It's not a good idea to fork rails4.2 (actually some gem `active-blabla`)
 
 !SLIDE center
 
@@ -609,7 +627,13 @@ Example: https://github.com/rails/rails/issues/34790
 
 !SLIDE center
 
-## Try to fix the warnings and let the Rspec output clean
+## Talking about debugging..
+
+My talk at RubyConfBr 2018: https://twitter.com/locaweb/status/1073257944651722752
+
+!SLIDE center
+
+## Try to fix the warnings and deprecations
 
 !SLIDE center
 
@@ -633,7 +657,7 @@ Example: https://github.com/rails/rails/issues/34790
 
 * Remeber the problem "The chicken and the egg"
 
-* Maybe it will be necessary to release the new database together with the new
+* Maybe it will be necessary to upgrade the new database together with the new
 Ruby
 
 !SLIDE center
@@ -646,7 +670,7 @@ Ruby
 
 * Luck you if you using Docker (or containers)
 
-* Request new servers if using VMs (assuming you don't use rbenv/rvm on production)
+* Create new servers if using VMs (assuming you don't use rbenv/rvm on production)
 
 * Be careful with system dependencies versions (ex: libxml2).
 
@@ -658,14 +682,6 @@ Ruby
 
 !SLIDE center
 
-# Finish him! Questions??
-
-TODO: gerar QRCODE feedfack form
-
-## Feedback form
-
-!SLIDE center
-
 ## Picks
 
 The source of this presentation: https://github.com/fabioperrella/good-practices-upgrading-ruby-version
@@ -674,7 +690,9 @@ This presentation was made with the gem **Showoff**: https://github.com/puppetla
 
 How to find a subject to do a presentation: http://www.greaterthancode.com/2016/11/21/008-sandi-metz-and-katrina-owen/
 
-## Me
+!SLIDE center
+
+# Finish him! Questions??
 
 https://fabioperrella.github.io
 
@@ -685,3 +703,9 @@ http://twitter.com/fabioperrella
 ## Work at Locaweb
 
 https://www.locaweb.com.br/carreira
+
+!SLIDE center
+
+## Feedback form
+
+![](../_images/qrcode_feedback.png)
