@@ -644,11 +644,17 @@ Ruby
 
 ## It's time to upgrade the SO too!
 
-* Luck you if using Docker (or containers)
+* Luck you if you using Docker (or containers)
 
 * Request new servers if using VMs (assuming you don't use rbenv/rvm on production)
 
 * Be careful with system dependencies versions (ex: libxml2).
+
+!SLIDE center
+
+## Use a tool to monitor the errors (we use Sentry)
+
+* Check the new errors
 
 !SLIDE center
 
