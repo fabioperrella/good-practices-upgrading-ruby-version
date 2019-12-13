@@ -130,6 +130,8 @@ Warning: there are some issues with EOL versions of Rails and new Rubies, ex: ht
 
 LOC: `git ls-files | grep .rb | xargs wc -l`
 
+(explicar melhor os comandos)
+
 Number of dependencies: `bundle | grep Using | wc -l`
 
 !SLIDE center
@@ -401,6 +403,8 @@ Error:
 
 ### Change the gem `ws_authentication_client` to accept new versions of gem `ox`
 
+(falar que precisa abrir um PR pra atualizar o gemspec ou fazer um fork)
+
 Example:
 
     @@@diff
@@ -525,6 +529,8 @@ Example: `13.6.0.ruby23` and `13.6.0.ruby26`
 
 **Warning**: Doing this, it will not work `gem 'X', '> 13.6'` in Gemfile
 
+(falar que da pra mudar o nome da gem, dependendo da versão do ruby)
+
 !SLIDE center
 
 ## Strategy 2: break compatibility with old rubies
@@ -631,6 +637,8 @@ Example: https://github.com/rails/rails/issues/34790
 
 My talk at RubyConfBr 2018: https://twitter.com/locaweb/status/1073257944651722752
 
+(colocar imagem da palestra)
+
 !SLIDE center
 
 ## Try to fix the warnings and deprecations
@@ -677,6 +685,8 @@ Ruby
 !SLIDE center
 
 ## Use a tool to monitor the errors (we use Sentry)
+
+(dar outros exemplos: rollbar, etc..)
 
 * Check the new errors
 
