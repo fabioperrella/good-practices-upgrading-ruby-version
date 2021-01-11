@@ -30,7 +30,7 @@ GEM
       rack (~> 1.4)
     rack-protection (1.5.5)
       rack
-    redcarpet (3.5.0)
+    redcarpet (3.5.1)
     ruby-dbus (0.14.1)
     ruby-enum (0.7.2)
       i18n
