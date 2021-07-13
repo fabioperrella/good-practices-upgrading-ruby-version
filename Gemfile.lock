@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.7.0)
+    addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     commonmarker (0.20.1)
       ruby-enum (~> 0.5)
@@ -24,7 +24,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     parslet (1.8.2)
     pdfkit (0.8.4.1)
-    public_suffix (4.0.1)
+    public_suffix (4.0.6)
     rack (1.6.11)
     rack-contrib (1.8.0)
       rack (~> 1.4)
